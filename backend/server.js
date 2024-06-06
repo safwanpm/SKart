@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const RegisterRouter = require('./src/router/RegisterRouter');
 const AdminRouter = require('./src/router/AdminRouter');
 const UserRouter = require('./src/router/UserRouter');
+const CartRouter = require('./src/router/CartRouter');
 require('dotenv').config()
 const app = express();
 
@@ -32,6 +33,7 @@ app.use((req, res, next) => {
 
 
 app.use('/register', RegisterRouter)
+app.use('/cart', CartRouter)
 app.use('/admin', AdminRouter)
 app.use('/user', UserRouter)
 

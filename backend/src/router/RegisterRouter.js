@@ -354,6 +354,7 @@ RegisterRouter.post('/glogin', async (req, res) => {
                 success: true,
                 error: false,
                 data: checkMail,
+                userId: checkMail._id,
                 message: "Success",
             });
         }
@@ -363,6 +364,7 @@ RegisterRouter.post('/glogin', async (req, res) => {
                 success: true,
                 error: false,
                 data: registerData,
+                userId: registerData._id,
                 message: "Registration Success",
             });
         }
@@ -396,6 +398,7 @@ RegisterRouter.post('/login', async (req, res) => {
                     error: false,
                     role: user.role,
                     email: email,
+                    userId: user._id,
                     message: " Admin Login successfully"
                 })
             }
@@ -404,6 +407,8 @@ RegisterRouter.post('/login', async (req, res) => {
                     success: true,
                     error: false,
                     role: user.role,
+                    userId: user._id,
+                    email: email,
                     message: " User Login successfully",
                     
                 })

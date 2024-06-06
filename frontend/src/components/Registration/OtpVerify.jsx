@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import Navbar from "./Navbar";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../User/Navbar";
 
-function OtpChangePswd() {
+function OtpVerify() {
   const inputRefs = [
     useRef(null),
     useRef(null),
@@ -15,12 +15,27 @@ function OtpChangePswd() {
     useRef(null),
   ];
   const [otp, setOtp] = useState("");
+  const [data, setdata] = useState({
+    name:"",
+    email:"",
+    password:"",
+    phone:"",
+  });
   const email = sessionStorage.getItem("email");
-  const navigate = useNavigate();
-
   useEffect(() => {
     inputRefs[0].current.focus();
   }, []);
+  useEffect(() => {
+    axios
+      .post("http://localhost:4005/register/view-details",
+         { email: email })
+      .then((res) => {
+        setdata(res.data.data);
+        console.log(res);
+      });
+  },[email]);
+
+  const navigate = useNavigate();
 
   const handleInputChange = (index, e) => {
     const value = e.target.value;
@@ -37,15 +52,16 @@ function OtpChangePswd() {
     });
   };
 
+  console.log(data);
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = { email: email, otp: otp }; // Only passing email and OTP
     axios
-      .post("http://localhost:4005/register/verify-forgot", data)
+      .post("http://localhost:4005/register/verify",  data )
       .then((res) => {
         console.log(res);
         toast.success(res.data.message);
-        navigate("/changePassword");
+        navigate("/");
+    
       })
       .catch((err) => {
         console.log("axios error", err);
@@ -55,7 +71,7 @@ function OtpChangePswd() {
 
   return (
     <>
-      <Navbar />
+     <Navbar/>
       <div className="relative flex min-h-screen flex-col mb-40 justify-center overflow-hidden bg-gray-50 py-12">
         <div className="relative bg-white px-6 pt-6 pb-9 shadow-xl mx-auto w-full max-w-lg rounded-2xl">
           <div className="mx-auto flex w-full max-w-md flex-col space-y-16">
@@ -118,4 +134,4 @@ function OtpChangePswd() {
   );
 }
 
-export default OtpChangePswd;
+export default OtpVerify;

@@ -42,8 +42,8 @@ function Navbar() {
 
         localStorage.setItem("email", res.data.email);
         localStorage.setItem("role", res.data.role);
-        
-        
+        localStorage.setItem("userId", res.data.userId);
+
         window.location.reload();
         navigate("/");
         toast.success(res.data.message);
@@ -75,10 +75,10 @@ function Navbar() {
               console.log(res);
               localStorage.setItem("email", res.data.data.email);
               localStorage.setItem("role", res.data.data.role);
+              localStorage.setItem("userId", res.data.userId);
               window.location.reload();
               navigate("/");
               toast.success(res.data.message);
-            
             });
         }
       } catch (error) {
@@ -114,7 +114,7 @@ function Navbar() {
   return (
     <>
       {/*Nav*/}
-      <nav id="header" className="w-full z-30 top-0 py-1 lg:px-10  ">
+      <nav id="header" className="w-full z-30 top-0 py lg:px-10  ">
         <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-3">
           <label
             htmlFor="menu-toggle"
@@ -142,7 +142,7 @@ function Navbar() {
           <div className="order-1 md:order-2">
             <a
               className="flex items-center tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl "
-              href=""
+              href="/"
             >
               <svg
                 className="fill-current text-gray-800 mr-2"
@@ -217,7 +217,7 @@ function Navbar() {
             </nav>
           </div>
           <div
-            className="order-2 md:order-3 flex items-center"
+            className="order-2 md:order-3 flex items-center my-10"
             id="nav-content"
           >
             {/*Modal part */}
@@ -229,8 +229,8 @@ function Navbar() {
                       <button
                         onClick={handleOpen}
                         type="button"
-                        className=" mt-6 text-gray-900 bg-white hover:bg-gray-900 border shadow-md hover:text-white focus:outline focus:ring-4
-   focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2
+                        className="  text-gray-900 bg-white hover:bg-gray-900 border shadow-md hover:text-white focus:outline focus:ring-4
+   focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5  
     dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                       >
                         Log in
@@ -363,8 +363,72 @@ function Navbar() {
             {localStorage.role && (
               <>
                 <a
+                  className="relative px-3 inline-block no-underline hover:text-black"
+                  href="wishlist"
+                >
+                  <svg
+                    className="bg-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                      fill="none"
+                      stroke="black"
+                      stroke-width="2"
+                    />
+                  </svg>
+                  <span className="absolute  top-0 right-0 block h-5 w-5 bg-red-500 text-white rounded-full text-center text-xs leading-5">
+                    5
+                  </span>
+                </a>
+
+                <a
+                  className="relative px-3 inline-block no-underline hover:text-black"
+                  href="cart"
+                >
+                  <svg
+                    className="bg-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={26}
+                    height={26}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M21,7H7.462L5.91,3.586C5.748,3.229,5.392,3,5,3H2v2h2.356L9.09,15.414C9.252,15.771,9.608,16,10,16h8 
+      c0.4,0,0.762-0.238,0.919-0.606l3-7c0.133-0.309,0.101-0.663-0.084-0.944C21.649,7.169,21.336,7,21,7z 
+      M17.341,14h-6.697L8.371,9 h11.112L17.341,14z"
+                      fill="fu"
+                      stroke="black"
+                      stroke-width="0.2"
+                    />
+                    <circle
+                      cx="10.5"
+                      cy="18.5"
+                      r="1.5"
+                      fill="full"
+                      stroke="black"
+                      stroke-width="1"
+                    />
+                    <circle
+                      cx="17.5"
+                      cy="18.5"
+                      r="1.5"
+                      fill="full"
+                      stroke="black"
+                      stroke-width="1"
+                    />
+                  </svg>
+                  <span className="absolute top-0 right-0 block h-5 w-5 bg-red-500 text-white rounded-full text-center text-xs leading-5 font-bold">
+                    3
+                  </span>
+                </a>
+
+                <a
                   onClick={toggleDropdown}
-                  className="inline-block no-underline hover:text-black "
+                  className="inline-block no-underline hover:text-black px-3 "
                   href="#"
                 >
                   <svg
@@ -378,28 +442,12 @@ function Navbar() {
                     <path d="M12 2C9.243 2 7 4.243 7 7s2.243 5 5 5 5-2.243 5-5S14.757 2 12 2zM12 10c-1.654 0-3-1.346-3-3s1.346-3 3-3 3 1.346 3 3S13.654 10 12 10zM21 21v-1c0-3.859-3.141-7-7-7h-4c-3.86 0-7 3.141-7 7v1h2v-1c0-2.757 2.243-5 5-5h4c2.757 0 5 2.243 5 5v1H21z" />
                   </svg>
                 </a>
-                <a
-                  className="pl-3 inline-block no-underline hover:text-black"
-                  href="#"
-                >
-                  <svg
-                    className="fill-current hover:text-black"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21,7H7.462L5.91,3.586C5.748,3.229,5.392,3,5,3H2v2h2.356L9.09,15.414C9.252,15.771,9.608,16,10,16h8 c0.4,0,0.762-0.238,0.919-0.606l3-7c0.133-0.309,0.101-0.663-0.084-0.944C21.649,7.169,21.336,7,21,7z M17.341,14h-6.697L8.371,9 h11.112L17.341,14z" />
-                    <circle cx="10.5" cy="18.5" r="1.5" />
-                    <circle cx="17.5" cy="18.5" r="1.5" />
-                  </svg>
-                </a>
 
                 {/* Dropdown menu */}
                 {isOpen && (
                   <div className="absolute right-10 mt-32 w-48 bg-white rounded-lg shadow-lg z-10">
                     <a
-                      href="#"
+                      href="profile"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       View Profile
