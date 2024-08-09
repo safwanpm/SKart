@@ -6,7 +6,7 @@ require('dotenv').config
 const ProductSchema = new Schema({
     name:{type :String},
     category:{type :String},
-    stock:{type :String},
+    stock:{type :Number},
     brand:{type :String},
     name:{type :String},
     description:{type :String},

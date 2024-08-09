@@ -4,6 +4,7 @@ import Navbar from "../../components/User/Navbar";
 import Product from "../../components/User/Product";
 import Footer from "../../components/User/Footer";
 import Popular from "../../components/User/Popular";
+import Logos from "../../components/User/Logos";
 
 function HomePg() {
   return (
@@ -14,7 +15,7 @@ function HomePg() {
       <Popular />
   
       <Product />
-
+<Logos/>
       <Footer />
     </div>
   );

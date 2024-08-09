@@ -1,38 +1,39 @@
+
 import React from "react";
 import Navbar from "../User/Navbar";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 
 function AddHomeSlider() {
-  const [data, setdata] = useState({
+  const [data, setData] = useState({
     name: "",
     description: "",
     price: "",
     category: "",
     offer: "",
-    images:"",
+    image: "",
   });
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
+  const [image, setImage] = useState(null);
+
   const setRegister = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setdata({ ...data, [name]: value });
+    setData({ ...data, [name]: value });
     console.log(data);
   };
-  const [files, setfiles] = useState([]);
+
   const validate = (values) => {
     var error = {};
     if (!values.name) {
       error.name = "Enter name";
     }
-
-    // if (!values.category) {
-    //   error.category = "select category";
-    // }
+    if (!values.category) {
+      error.category = "Select category";
+    }
     if (!values.description) {
       error.description = "Enter description";
     }
@@ -42,34 +43,11 @@ function AddHomeSlider() {
     if (!values.offer) {
       error.offer = "Enter offer";
     }
-    if (!values.category) {
-      error.category = "Enter brand";
+    if (!values.image) {
+      error.image = "Upload image";
     }
-
-    if (!values.images) {
-      error.images = "Upload image";
-    }
-
     return error;
   };
-
-  // const Updatevalidation = (e) => {
-  //   e.preventDefault();
-  //   setFormErrors(validate(data));
-  //   setIsSubmit(true);
-  //   if (Object.keys(formErrors).length === 0 && isSubmit) {
-  //     axios
-  //       .put("http://localhost:4000/admin/update-hotel", data)
-  //       .then((res) => {
-  //         console.log(res);
-  //         navigate("hotel/hotel_details");
-  //         toast.success(res.data.message);
-  //       })
-  //       .catch((err) => {
-  //         console.log("error ", err);
-  //       });
-  //   }
-  // };
 
   const validation = (e) => {
     e.preventDefault();
@@ -77,15 +55,12 @@ function AddHomeSlider() {
     setIsSubmit(true);
 
     if (Object.keys(formErrors).length === 0 && isSubmit) {
-      if (files.length > 0) {
-        const data = new FormData();
-
-        files.forEach((files) => {
-          data.append("files", files);
-        });
+      if (image) {
+        const single = new FormData();
+        single.append("image", image);
 
         axios
-          .post("http://localhost:4005/admin/upload-images", data)
+          .post("http://localhost:4005/admin/upload-slider", single)
           .then((res) => {
             console.log(res);
           })
@@ -93,26 +68,11 @@ function AddHomeSlider() {
             console.log("Error in POST request:", err);
           });
       }
-      // if (logo) {
-      //   const single = new FormData();
-
-      //   single.append("logo", logo);
-
-      //   axios
-      //     .post("http://localhost:4000/admin/upload-logo", single)
-      //     .then((res) => {
-      //       console.log(res);
-      //     })
-      //     .catch((err) => {
-      //       console.log("Error in POST request:", err);
-      //     });
-      // }
 
       axios
-        .post("http://localhost:4005/admin/addProduct", data)
+        .post("http://localhost:4005/admin/addSliderProduct", data)
         .then((res) => {
           console.log("Response from POST request:", res);
-
           toast(res.data.message);
         })
         .catch((err) => {
@@ -120,6 +80,7 @@ function AddHomeSlider() {
         });
     }
   };
+
   return (
     <>
       <Navbar />
@@ -129,10 +90,7 @@ function AddHomeSlider() {
           <div className="grid grid-cols-2 gap-4">
             {/* Product Name */}
             <div>
-              <label
-                htmlFor="productName"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="productName" className="block text-sm font-medium">
                 Product Name
               </label>
               <input
@@ -146,10 +104,7 @@ function AddHomeSlider() {
             </div>
             {/* Product Description */}
             <div>
-              <label
-                htmlFor="productDescription"
-                className="block text-sm font-medium"
-              >
+              <label htmlFor="productDescription" className="block text-sm font-medium">
                 Description
               </label>
               <textarea
@@ -162,7 +117,7 @@ function AddHomeSlider() {
               ></textarea>
             </div>
             {/* Category */}
-            {/* <div>
+            <div>
               <label htmlFor="category" className="block text-sm font-medium">
                 Category
               </label>
@@ -171,12 +126,14 @@ function AddHomeSlider() {
                 name="category"
                 className="input-field"
                 onChange={setRegister}
+                value={data.category}
               >
-                <option value="electronics">Electronics</option>
-                <option value="clothing">Clothing</option>
-                <option value="books">Books</option>
+                <option value="">Select</option>
+                <option value="mobile">Mobile</option>
+                <option value="laptop">Laptop</option>
+                <option value="earphone">Earphone</option>
               </select>
-            </div> */}
+            </div>
             {/* Price */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium">
@@ -229,27 +186,20 @@ function AddHomeSlider() {
                 type="text"
                 id="offer"
                 name="offer"
-                className="input-field border p-2"
+                className="input-field"
                 placeholder="Enter product offer"
               />
             </div>
-            {/* Image URL */}
+            {/* Image */}
             <div>
               <label htmlFor="image" className="block text-sm font-medium">
-                Images
+                Image
               </label>
               <input
-                multiple
                 onChange={(e) => {
-                  console.log(e.target.files);
-                  setfiles([...e.target.files]);
-                  setdata({
-                    ...data,
-                    images: [...e.target.files].map((file) => file.name),
-                  });
-                }}
-                onClick={() => {
-                  setFormErrors({ ...formErrors, images: "" });
+                  console.log(e.target.files[0]);
+                  setImage(e.target.files[0]);
+                  setData({ ...data, image: e.target.files[0].name });
                 }}
                 type="file"
                 id="image"
@@ -261,7 +211,6 @@ function AddHomeSlider() {
           {/* Submit button */}
           <button
             type="submit"
-            onClick={validation}
             className="bg-black text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             Add Product

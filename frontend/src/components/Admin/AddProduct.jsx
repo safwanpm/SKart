@@ -73,6 +73,17 @@ function AddProduct() {
   //   }
   // };
 
+
+  const handleUpdate= ()=>{
+    axios
+          .post("http://localhost:4005/admin/upload-images", data)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log("Error in POST request:", err);
+          });
+  }
   const validation = (e) => {
     e.preventDefault();
     setFormErrors(validate(data));
@@ -122,6 +133,7 @@ function AddProduct() {
         });
     }
   };
+  
   return (
     <>
       <Navbar />
@@ -164,7 +176,7 @@ function AddProduct() {
               ></textarea>
             </div>
             {/* Category */}
-            {/* <div>
+            <div>
               <label htmlFor="category" className="block text-sm font-medium">
                 Category
               </label>
@@ -173,12 +185,14 @@ function AddProduct() {
                 name="category"
                 className="input-field"
                 onChange={setRegister}
+                value={data.category}
               >
-                <option value="electronics">Electronics</option>
-                <option value="clothing">Clothing</option>
-                <option value="books">Books</option>
+                <option value="">Select</option>
+                <option value="mobile">Mobile</option>
+                <option value="laptop">Laptop</option>
+                <option value="earphone">Earphone</option>
               </select>
-            </div> */}
+            </div>
             {/* Price */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium">

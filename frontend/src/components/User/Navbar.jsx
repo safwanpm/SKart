@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
@@ -7,7 +7,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
-
+import { fetchCart } from "../../redux/CartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 const style = {
   position: "absolute",
   top: "50%",
@@ -21,6 +24,45 @@ const style = {
   p: 2,
 };
 function Navbar() {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const [totalCartCount, setTotalCartCount] = useState(0);
+  const [totalWishlistCount, setTotalWishlistCount] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const userId = localStorage.getItem("userId");
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchCart(userId));
+    }
+  }, [dispatch, userId]);
+
+  // axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4005/cart/viewWishlist/${userId}`)
+      .then((res) => {
+        console.log(res);
+        const wishlistData = res.data.data;
+        setCart(wishlistData);
+        const totalWishlistCount = wishlistData.reduce(
+          (acc, item) => acc + item.count,
+          0
+        );
+        setTotalWishlistCount(wishlistData.length);
+        console.log(
+          "Total count of items in the Wishlist:",
+          totalWishlistCount
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [userId]);
+
   const navigate = useNavigate();
   const [data, setData] = useState({
     email: "",
@@ -32,7 +74,7 @@ function Navbar() {
     const value = event.target.value;
     setData({ ...data, [name]: value });
   };
-  console.log(data);
+
   const HandleSubmit = (e) => {
     e.preventDefault();
     axios
@@ -45,7 +87,7 @@ function Navbar() {
         localStorage.setItem("userId", res.data.userId);
 
         window.location.reload();
-        navigate("/");
+        navigate("/home");
         toast.success(res.data.message);
       })
       .catch((err) => {
@@ -54,38 +96,37 @@ function Navbar() {
       });
   };
 
-  const [gdata, setgdata] = useState();
-  const login = useGoogleLogin({
-    onSuccess: async (response) => {
-      try {
-        const res = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${response.access_token}`,
-            },
-          }
-        );
-        setgdata(res.data);
+  // const [gdata, setgdata] = useState();
+  // const login = useGoogleLogin({
+  //   onSuccess: async (response) => {
+  //     try {
+  //       const res = await axios.get(
+  //         "https://www.googleapis.com/oauth2/v3/userinfo",
+  //         {
+  //           withCredentials: true, // Include this option to send credentials
+  //         }
+  //       );
 
-        if (res.data) {
-          axios
-            .post("http://localhost:4005/register/glogin", res.data)
-            .then((res) => {
-              console.log(res);
-              localStorage.setItem("email", res.data.data.email);
-              localStorage.setItem("role", res.data.data.role);
-              localStorage.setItem("userId", res.data.userId);
-              window.location.reload();
-              navigate("/");
-              toast.success(res.data.message);
-            });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-  });
+  //       setgdata(res.data);
+
+  //       if (res.data) {
+  //         axios
+  //           .post("http://localhost:4005/register/glogin", res.data)
+  //           .then((res) => {
+  //             console.log(res);
+  //             localStorage.setItem("role", res.data.data.role);
+  //             localStorage.setItem("userId", res.data.userId);
+  //             window.location.reload();
+  //             navigate("/home");
+  //             toast.success(res.data.message);
+  //           });
+  //       }
+  //     } catch (error) {
+  //       console.log("catch error in g login ", error);
+  //     }
+  //   },
+  // });
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMainMenu = () => {
@@ -111,6 +152,7 @@ function Navbar() {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
   return (
     <>
       {/*Nav*/}
@@ -140,9 +182,9 @@ function Navbar() {
           />
 
           <div className="order-1 md:order-2">
-            <a
+            <Link
               className="flex items-center tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl "
-              href="/"
+              to="/home"
             >
               <svg
                 className="fill-current text-gray-800 mr-2"
@@ -154,7 +196,7 @@ function Navbar() {
                 <path d="M5,22h14c1.103,0,2-0.897,2-2V9c0-0.553-0.447-1-1-1h-3V7c0-2.757-2.243-5-5-5S7,4.243,7,7v1H4C3.447,8,3,8.447,3,9v11 C3,21.103,3.897,22,5,22z M9,7c0-1.654,1.346-3,3-3s3,1.346,3,3v1H9V7z M5,10h2v2h2v-2h6v2h2v-2h2l0.002,10H5V10z" />
               </svg>
               NORDICS
-            </a>
+            </Link>
           </div>
           <div
             className={`${
@@ -221,6 +263,7 @@ function Navbar() {
             id="nav-content"
           >
             {/*Modal part */}
+
             {!localStorage.role && (
               <>
                 <div className="container">
@@ -256,10 +299,50 @@ function Navbar() {
                               <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                                 Sign up to your account
                               </h2>
-                              <button onClick={() => login()}>
-                                Sign in with Google 🚀
-                              </button>
-                              ;
+                              {/* <button onClick={() => login()}>
+                                Sign in with Google 
+                              </button> */}
+                              <GoogleLogin
+                                onSuccess={(credentialResponse) => {
+                                  console.log(credentialResponse);
+                                  const decoded = jwtDecode(
+                                    credentialResponse.credential
+                                  );
+                                  try {
+                                    if (decoded) {
+                                      axios
+                                        .post(
+                                          "http://localhost:4005/register/glogin",
+                                          decoded
+                                        )
+                                        .then((res) => {
+                                          console.log(res);
+                                          localStorage.setItem(
+                                            "role",
+                                            res.data.data.role
+                                          );
+                                          localStorage.setItem(
+                                            "userId",
+                                            res.data.userId
+                                          );
+                                          window.location.reload();
+                                          navigate("/home");
+                                          toast.success(res.data.message);
+                                        });
+                                    }
+                                  } catch (error) {
+                                    console.log(
+                                      "catch error in g login ",
+                                      error
+                                    );
+                                  }
+                                }}
+                                onError={() => {
+                                  console.log("Login Failed");
+                                }}
+                                useOneTap
+                              />
+
                               <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                                 <form className="space-y-6">
                                   <div>
@@ -360,11 +443,12 @@ function Navbar() {
                 </div>
               </>
             )}
+
             {localStorage.role && (
               <>
-                <a
+                <Link
                   className="relative px-3 inline-block no-underline hover:text-black"
-                  href="wishlist"
+                  to="/wishlist"
                 >
                   <svg
                     className="bg-white"
@@ -381,13 +465,13 @@ function Navbar() {
                     />
                   </svg>
                   <span className="absolute  top-0 right-0 block h-5 w-5 bg-red-500 text-white rounded-full text-center text-xs leading-5">
-                    5
+                    {totalWishlistCount}
                   </span>
-                </a>
+                </Link>
 
-                <a
+                <Link
                   className="relative px-3 inline-block no-underline hover:text-black"
-                  href="cart"
+                  to="/cart"
                 >
                   <svg
                     className="bg-white"
@@ -422,9 +506,9 @@ function Navbar() {
                     />
                   </svg>
                   <span className="absolute top-0 right-0 block h-5 w-5 bg-red-500 text-white rounded-full text-center text-xs leading-5 font-bold">
-                    3
+                    {totalQuantity}
                   </span>
-                </a>
+                </Link>
 
                 <a
                   onClick={toggleDropdown}
@@ -446,12 +530,12 @@ function Navbar() {
                 {/* Dropdown menu */}
                 {isOpen && (
                   <div className="absolute right-10 mt-32 w-48 bg-white rounded-lg shadow-lg z-10">
-                    <a
-                      href="profile"
+                    <Link
+                      to="/profile"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       View Profile
-                    </a>
+                    </Link>
                     <a
                       href="#"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"

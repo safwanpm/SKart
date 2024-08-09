@@ -1,9 +1,12 @@
-import {configureStore} from '@reduxjs/toolkit';
-import registerReducer from './register'
 
-export const store = configureStore({
-    reducer:{
-        register: registerReducer
-    }
-})
+import { configureStore } from '@reduxjs/toolkit';
+import cartReducer from './CartSlice'
 
+const store = configureStore({
+  reducer: {
+    cart: cartReducer,
+  },
+  // Middleware is added automatically by Redux Toolkit
+});
+
+export default store;

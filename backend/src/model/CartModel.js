@@ -7,9 +7,9 @@ const CartSchema = new Schema({
     userId:{type:String},
     cart:[{
         productId:{type:String},
-        productname:{type:String},
+       
         count: { type: Number, default: 1 },
     }],  
 })
 const CartModel =mongoose.model('CartTb',CartSchema)
-module.exports=CartModel
+module.exports=CartModel    

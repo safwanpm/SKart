@@ -3,7 +3,7 @@ import React from 'react'
 function Logos() {
   return (
     <>
-    <div className='px-10'>
+    <div className='px-20'>
     <div className="flex flex-col mx-3 bg-white rounded-lg px-10">
       <div className="w-full draggable">
         <div className="container flex flex-col items-center gap-8 mx-auto my-32">

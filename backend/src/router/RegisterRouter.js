@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const RegisterModel = require('../model/RegisterModel');
 var bcrypt = require('bcryptjs');
 const OtpModel = require('../model/OtpModel');
-
+const jwt = require('jsonwebtoken')
 // Set up nodemailer transporter with Gmail SMTP
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -160,10 +160,10 @@ RegisterRouter.post('/verify', async (req, res) => {
             phone: phone,
             password: password,
             status: null,
-            role:1,
-            cart:null,
-            wishlist:null,
-            typelogin:'normal'
+            role: 1,
+            cart: null,
+            wishlist: null,
+            typelogin: 'normal'
 
         };
         const registerData = await RegisterModel(userDetails).save();
@@ -306,7 +306,7 @@ RegisterRouter.post('/verify-forgot', async (req, res) => {
 
 RegisterRouter.put('/changepassword', async (req, res) => {
     try {
-        
+
         const { password, email } = req.body;
         const hashedPass = await bcrypt.hash(password, 12);
         const details = await RegisterModel.findOneAndUpdate({ email: email },
@@ -350,6 +350,8 @@ RegisterRouter.post('/glogin', async (req, res) => {
         };
         const checkMail = await RegisterModel.findOne({ email: email });
         if (checkMail) {
+            // const token = jwt.sign({ id: user._id, email: email }, 'tokenkey', { expiresIn: "1m" })
+            // res.cookie('token', token)
             return res.status(200).json({
                 success: true,
                 error: false,
@@ -360,6 +362,8 @@ RegisterRouter.post('/glogin', async (req, res) => {
         }
         if (!checkMail) {
             const registerData = await RegisterModel(userDetails).save();
+            // const token =jwt.sign({id:user._id,email:email},'tokenkey',{expiresIn:"1m"})
+            //     res.cookie('token',token)
             return res.status(200).json({
                 success: true,
                 error: false,
@@ -377,12 +381,14 @@ RegisterRouter.post('/glogin', async (req, res) => {
         });
     }
 });
+
+
 RegisterRouter.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
-        
-         
-        const user = await RegisterModel.findOne({ email })
+
+
+        const user = await RegisterModel.findOne({ email: email })
         if (!user) {
             return res.status(400).json({
                 success: false,
@@ -393,6 +399,8 @@ RegisterRouter.post('/login', async (req, res) => {
         const encrypt = await bcrypt.compare(password, user.password)
         if (encrypt == true) {
             if (user.role == 0) {
+                const token = jwt.sign({ id: user._id, email: email }, 'tokenkey', { expiresIn: "1h" })
+                res.cookie('token', token)
                 return res.status(200).json({
                     success: true,
                     error: false,
@@ -403,6 +411,8 @@ RegisterRouter.post('/login', async (req, res) => {
                 })
             }
             if (user.role == 1) {
+                const token = jwt.sign({ id: user._id, email: email }, 'tokenkey', { expiresIn: "2h" })
+                res.cookie('token', token)
                 return res.status(200).json({
                     success: true,
                     error: false,
@@ -410,7 +420,7 @@ RegisterRouter.post('/login', async (req, res) => {
                     userId: user._id,
                     email: email,
                     message: " User Login successfully",
-                    
+
                 })
             }
 

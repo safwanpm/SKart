@@ -31,6 +31,31 @@ const registerSchema = new Schema({
     cart: {
         type: String
     },
+    address:[{
+       
+        name:{
+            type:String
+        },
+        phone:{
+            type:String
+        },
+        pincode: {
+            type: String,
+        },
+        state: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        houseNo: {
+            type: String,   
+        },
+        street: {
+            type: String,
+        },
+
+    }],
      typelogin: {
         type: String
     }
